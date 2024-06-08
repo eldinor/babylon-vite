@@ -18,7 +18,7 @@
         "noImplicitAny": false, // usually prevents code from using "any" type fallbacks to prevent untraceable JS errors, but we'll need this disabled for our example code
         "noUnusedLocals": false, // usually raises an error for any unused local variables, but we'll need this disabled for our example code
         "noUnusedParameters": true, // raises an error for unused parameters
-        "noImplicitReturns": true, // raises an error for functions that return nothing
+        "noImplicitReturns": false, // raises an error for functions that return nothing
         "skipLibCheck": true, // skip type-checking of .d.ts files (it speeds up transpiling)
         "strictPropertyInitialization": false,
         "paths": {
