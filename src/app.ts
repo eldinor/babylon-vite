@@ -12,7 +12,9 @@ import HavokPhysics from "@babylonjs/havok";
 
 import MainScene from "./playground/main-scene";
 
-import MyScene from "./core/my-scene";
+//import MyScene from "./core/my-scene";
+
+import MyScene from "./drone/dronscene";
 
 class App {
   public engine: Engine;
