@@ -89,6 +89,8 @@ export default class MyScene {
     );
 
     res.meshes[0].scaling.scaleInPlace(0.01);
+    res.meshes[0].position.x = -12;
+    res.meshes[0].position.z = 15;
 
     const res2 = await BABYLON.SceneLoader.ImportMeshAsync(
       "",
