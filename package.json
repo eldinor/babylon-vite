@@ -25,6 +25,10 @@
     "@babylonjs/loaders": "^7.10.0",
     "@babylonjs/materials": "^7.10.0",
     "@babylonjs/post-processes": "^7.10.0",
+    "@gltf-transform/core": "^4.0.8",
+    "@gltf-transform/extensions": "^4.0.8",
+    "@gltf-transform/functions": "^4.0.8",
+    "meshoptimizer": "^0.21.0",
     "yuka": "^0.7.8"
   }
 }

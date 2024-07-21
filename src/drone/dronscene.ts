@@ -149,6 +149,7 @@ export default class MyScene {
     this.scene.onBeforeRenderObservable.add(() => {
       const delta = this._time.update().getDelta();
       this._entityManager.update(delta); // YUKA world
+      //@ts-ignore
       this._entityManager.entities[0].stateMachine.update(delta);
     });
   }

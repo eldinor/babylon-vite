@@ -10,11 +10,17 @@ import {
 } from "@babylonjs/core";
 import HavokPhysics from "@babylonjs/havok";
 
-import MainScene from "./playground/main-scene";
+//import MainScene from "./playground/main-scene";
+
+// import FamilyScene from "./drone/familyscene";
+
+//import AniScene from "./playground/ani-scene";
 
 //import MyScene from "./core/my-scene";
 
-import MyScene from "./drone/dronscene";
+//import MyScene from "./drone/dronscene";
+
+import OptScene from "./playground/opt-scene";
 
 class App {
   public engine: Engine;
@@ -44,9 +50,9 @@ class App {
     this.scene = new Scene(this.engine);
 
     // Add physics. If not needed, you can annotate it to improve loading speed and environment performance.
-    await this._setPhysics();
+    // await this._setPhysics();
 
-    new MyScene(this.scene, this.canvas, this.engine);
+    new OptScene(this.scene, this.canvas, this.engine);
 
     this._config();
     this._renderer();
@@ -67,6 +73,22 @@ class App {
       const div = document.createElement("div");
       div.id = "display-fps";
       div.innerHTML = "0";
+      document.body.appendChild(div);
+    }
+  }
+  //
+  _camRad(): void {
+    const dom = document.getElementById("display-camrad");
+    if (dom) {
+      dom.innerHTML =
+        "Camera Radius " +
+        `${(this.scene.activeCamera as ArcRotateCamera).radius.toFixed(1)}`;
+    } else {
+      const div = document.createElement("div");
+      div.id = "display-camrad";
+      div.innerHTML =
+        "Camera Radius " +
+        `${(this.scene.activeCamera as ArcRotateCamera).radius.toFixed()}`;
       document.body.appendChild(div);
     }
   }
@@ -109,6 +131,7 @@ class App {
   _renderer(): void {
     this.engine.runRenderLoop(() => {
       this._fps();
+      this._camRad();
       this.scene.render();
     });
   }
