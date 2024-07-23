@@ -100,9 +100,9 @@ export default class OptScene {
     //
     const assetArrayBuffer = await BABYLON.Tools.LoadFileAsync(
       // "https://raw.githubusercontent.com/eldinor/ForBJS/master/yukae.glb",
-      "https://raw.githubusercontent.com/eldinor/ForBJS/master/alien_probe.glb",
+      // "https://raw.githubusercontent.com/eldinor/ForBJS/master/alien_probe.glb",
       // "https://raw.githubusercontent.com/eldinor/ForBJS/master/ccity_building_set_1.glb",
-      // "model/cargoship-opt.glb",
+      "model/cargoship-opt.glb",
       //  "model/tunnel1-opt.glb",
       true
     );
@@ -139,7 +139,7 @@ export default class OptScene {
       // m.normalizeToUnitCube();
     });
 
-    console.log(originalTotalVerts);
+    console.log("Original Vertices: ", originalTotalVerts);
     //
     // merge(res.meshes[0].getChildMeshes(), res.skeletons[0]);
 
@@ -233,7 +233,7 @@ export default class OptScene {
       //  m.normalizeToUnitCube();
       //  m.computeWorldMatrix();
     });
-    console.log(newTotalVerts);
+    console.log("Optimized Vertices ", newTotalVerts);
 
     console.log(
       "Simplified Model Uploaded " +
@@ -256,9 +256,28 @@ export default class OptScene {
         ((Date.now() - timer) * 0.001).toFixed(2) +
         " seconds"
     );
+    /*
+    let tempMat = merged2?.material;
+    const origMat = merged?.material;
+    tempMat = origMat;
+    if (merged?.material != undefined && merged2?.material != undefined) {
+      merged2.material = merged.material;
+    }
 
-    res.meshes[0].dispose();
-    newGLB.meshes[0].dispose();
+    tempMat?.dispose();
+    */
+    //
+    /*
+    res.meshes[0].getChildMeshes().forEach((m) => {
+      m.material?.dispose();
+    });
+    newGLB.meshes[0].getChildMeshes().forEach((m) => {
+      m.material?.dispose();
+    });
+    */
+    //
+    res.meshes[0].dispose(false, true);
+    newGLB.meshes[0].dispose(false, true);
 
     merged?.addLODLevel(4, merged2);
     //

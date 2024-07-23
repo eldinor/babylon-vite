@@ -45,7 +45,42 @@ export default class MainScene {
 
   async loadComponents(): Promise<void> {
     // Load your files in order
-    new Ground(this.scene);
+    // new Ground(this.scene);
+    //
+
+    const assetArrayBuffer = await BABYLON.Tools.LoadFileAsync(
+      // "https://raw.githubusercontent.com/eldinor/ForBJS/master/yukae.glb",
+      // "https://raw.githubusercontent.com/eldinor/ForBJS/master/alien_probe.glb",
+      // "https://raw.githubusercontent.com/eldinor/ForBJS/master/ccity_building_set_1.glb",
+      "model/cargoship-opt.glb",
+      //  "model/tunnel1-opt.glb",
+      true
+    );
+
+    const myWorker = new Worker("worker.js");
+    console.log(myWorker);
+
+    const message = assetArrayBuffer;
+    myWorker.postMessage(message);
+    console.log("Message posted to worker");
+
+    myWorker.onmessage = (e) => {
+      console.log("Message received from worker", e.data);
+      const assetUrl = URL.createObjectURL(e.data);
+      console.log(assetUrl);
+
+      BABYLON.SceneLoader.ImportMeshAsync(
+        "",
+        assetUrl,
+        undefined,
+        this.scene,
+        undefined,
+        ".glb"
+      );
+      //  res.meshes[0].normalizeToUnitCube(true);
+    };
+    //
+    //
     /*
     let res = await BABYLON.SceneLoader.ImportMeshAsync(
       "",
