@@ -1,4 +1,4 @@
-importScripts("@gl");
+
 onmessage = (e) => {
   console.log("Message received from main script", e.data);
  // const workerResult = e.data * 3;

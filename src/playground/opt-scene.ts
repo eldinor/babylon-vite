@@ -100,9 +100,9 @@ export default class OptScene {
     //
     const assetArrayBuffer = await BABYLON.Tools.LoadFileAsync(
       // "https://raw.githubusercontent.com/eldinor/ForBJS/master/yukae.glb",
-      // "https://raw.githubusercontent.com/eldinor/ForBJS/master/alien_probe.glb",
+      "https://raw.githubusercontent.com/eldinor/ForBJS/master/alien_probe.glb",
       // "https://raw.githubusercontent.com/eldinor/ForBJS/master/ccity_building_set_1.glb",
-      "model/cargoship-opt.glb",
+      // "model/cargoship-opt.glb",
       //  "model/tunnel1-opt.glb",
       true
     );
@@ -279,7 +279,7 @@ export default class OptScene {
     res.meshes[0].dispose(false, true);
     newGLB.meshes[0].dispose(false, true);
 
-    merged?.addLODLevel(4, merged2);
+    merged?.addLODLevel(3, merged2);
     //
     /*
     res.meshes[0].getChildMeshes().forEach((m) => {

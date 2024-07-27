@@ -10,7 +10,7 @@ import {
 } from "@babylonjs/core";
 import HavokPhysics from "@babylonjs/havok";
 
-import MainScene from "./playground/main-scene";
+// import MainScene from "./playground/main-scene";
 
 // import FamilyScene from "./drone/familyscene";
 
@@ -20,7 +20,7 @@ import MainScene from "./playground/main-scene";
 
 //import MyScene from "./drone/dronscene";
 
-// import OptScene from "./playground/opt-scene";
+import OptScene from "./playground/opt-scene";
 
 class App {
   public engine: Engine;
@@ -52,7 +52,7 @@ class App {
     // Add physics. If not needed, you can annotate it to improve loading speed and environment performance.
     // await this._setPhysics();
 
-    new MainScene(this.scene, this.canvas, this.engine);
+    new OptScene(this.scene, this.canvas, this.engine);
 
     this._config();
     this._renderer();
