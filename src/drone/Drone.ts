@@ -60,9 +60,9 @@ export class IdleState extends YUKA.State<YUKA.GameEntity> {
     drone.velocity = new YUKA.Vector3(0, 0, 0);
     drone.steering.behaviors[0].active = false;
   }
-
+  //@ts-ignore
   execute(drone: any) {}
-
+  //@ts-ignore
   exit(drone) {}
 }
 
@@ -102,6 +102,6 @@ class BackState extends YUKA.State<YUKA.GameEntity> {
       drone.stateMachine.changeTo(IDLE);
     }
   }
-
+  //@ts-ignore
   exit(drone) {}
 }
