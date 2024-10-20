@@ -96,7 +96,7 @@ class App {
   // Auxiliary Class Configuration
   _config(): void {
     // Axes
-    new AxesViewer();
+    // new AxesViewer();
 
     // inspector
     this._bindEvent();
