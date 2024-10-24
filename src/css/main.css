@@ -47,3 +47,11 @@ form {padding: 15px;}
  overflow: auto;
  margin-bottom: 40px;
 }
+#progressBar {
+  position: absolute;
+  bottom:0px;
+  left: 0px;
+  width: 100%;
+ color:tomato;
+  display: none;
+}

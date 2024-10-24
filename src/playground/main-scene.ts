@@ -73,6 +73,8 @@ export default class MainScene {
 
     let grid: Grid | undefined;
 
+    let counter = 0;
+
     // keep track of selected files in this array
     let files = [];
     let promises = [];
@@ -96,8 +98,11 @@ export default class MainScene {
       e.preventDefault();
 
       let res: AssetContainer;
-      screenshotArray.length = 0;
+      (document.getElementById("progressBar") as any)!.value = 0;
       document.getElementById("sidebar")!.innerHTML = "";
+      (document.getElementById("progressBar") as any)!.style.display =
+        "inline-block";
+
       dataArray.length = 0; // if not the file will be added - TODO later, probably
 
       for (const file of files) {
@@ -113,8 +118,15 @@ export default class MainScene {
         let objectURL = URL.createObjectURL(file);
 
         assetArrayBuffer = await Tools.LoadFileAsync(objectURL, true);
+        counter++;
 
-        console.log(assetArrayBuffer);
+        let percent = (counter / files.length) * 100;
+        (document.getElementById("progressBar") as any)!.value =
+          Math.round(percent);
+        setTimeout(() => {
+          (document.getElementById("progressBar") as any)!.style.display =
+            "none";
+        }, 1000);
 
         res.addAllToScene();
 
@@ -154,10 +166,15 @@ export default class MainScene {
           "Size",
           {
             name: "Screenshot",
-            formatter: (cell) => html(`<img src="${cell}" width=200>`),
+            formatter: (cell) => html(`<img src="${cell}" width=300>`),
           },
         ],
         data: [...dataArray],
+        style: {
+          table: {},
+          th: {},
+          td: {},
+        },
       });
       console.log(grid);
 
