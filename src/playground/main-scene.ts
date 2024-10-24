@@ -9,7 +9,11 @@ import {
   Vector3,
 } from "@babylonjs/core";
 import { AssetContainer } from "@babylonjs/core/assetContainer";
+import { Color4 } from "@babylonjs/core/Maths/math.color";
 import "@babylonjs/loaders";
+import { GLTFFileLoader } from "@babylonjs/loaders";
+import { Grid, html } from "gridjs";
+import "gridjs/dist/theme/mermaid.css";
 
 import { Ground } from "./ground";
 
@@ -39,9 +43,15 @@ export default class MainScene {
     this.camera.setTarget(Vector3.Zero());
   }
 
-  _setLight(scene: Scene): void {
+  async _setLight(scene: Scene): Promise<void> {
     const light = new HemisphericLight("light", new Vector3(0, 1, 0), scene);
     light.intensity = 0.7;
+
+    scene.createDefaultEnvironment({
+      createGround: false,
+      createSkybox: false,
+    });
+    scene.clearColor = new Color4(0, 0, 0, 0);
   }
 
   _setPipeLine(): void {
@@ -57,49 +67,60 @@ export default class MainScene {
     // Load your files in order
     //   new Ground(this.scene);
 
-    const someArray: Array<string> = [];
+    const screenshotArray: Array<string> = [];
+
+    const dataArray: Array<[string, string, string]> = [];
+
+    let grid: Grid | undefined;
 
     // keep track of selected files in this array
     let files = [];
     let promises = [];
+    let assetArrayBuffer: ArrayBuffer | undefined;
 
     // various form elements
     console.log(document.forms);
-    const form = document.forms.uploader;
-    const bttn = form.save;
-    const input = form.querySelector('input[name="myfile[]"]');
+    const form = document.forms.namedItem("uploader");
+
+    const bttn = form!.save;
+    const input = form!.querySelector('input[name="myfile[]"]');
 
     const top = document.getElementById("top")!;
 
     // event handler to add selcted files to array - one or more at a time
-    input.addEventListener("change", function (e) {
+    input!.addEventListener("change", function (e) {
       for (let i = 0; i < this.files.length; i++) files.push(this.files[i]);
     });
 
-    // event handler to process button click. Ajax request sent using Fetch
-    // result echoed to console only
     bttn.addEventListener("click", async (e) => {
       e.preventDefault();
 
-      let fd = new FormData();
-
-      // create a new Promise for each file and upload. Resolve on success
-
       let res: AssetContainer;
+      screenshotArray.length = 0;
+      document.getElementById("sidebar")!.innerHTML = "";
+      dataArray.length = 0; // if not the file will be added - TODO later, probably
 
       for (const file of files) {
-        console.info("Promise to upload:%s", file.name);
+        console.info(
+          "Promise to upload:%s",
+          (file as File).size,
+          (file as File).name
+        );
         console.log(files);
         //
         res = await SceneLoader.LoadAssetContainerAsync("", file);
 
         let objectURL = URL.createObjectURL(file);
 
-        const assetArrayBuffer = await Tools.LoadFileAsync(objectURL, true);
+        assetArrayBuffer = await Tools.LoadFileAsync(objectURL, true);
 
         console.log(assetArrayBuffer);
 
         res.addAllToScene();
+
+        this.camera.useFramingBehavior = true;
+        this.camera.framingBehavior!.framingTime = 0;
+        this.camera.framingBehavior!.zoomOnMeshHierarchy(res.meshes[0], true);
 
         const scr = await Tools.CreateScreenshotUsingRenderTargetAsync(
           this.engine,
@@ -108,41 +129,45 @@ export default class MainScene {
             precision: 1.0,
           }
         );
-        res.removeAllFromScene();
-        res.dispose();
+        //   res.removeAllFromScene();
         //
         //  console.log(scr);
-        someArray.push(scr);
-        //   res.dispose();
-      }
-      console.log(someArray);
 
-      for (const item of someArray) {
-        let imageELement = document.createElement("img");
-        imageELement.setAttribute("src", item);
-        imageELement.width = 200;
-        top.appendChild(imageELement);
+        //  dataLineArray.push(file.name, file.size, scr);
+        dataArray.push([file.name as string, file.size as string, scr]);
+        res.dispose();
       }
+      console.log(dataArray);
+
+      if (grid) {
+        grid.destroy();
+      }
+
+      grid = new Grid({
+        resizable: true,
+        sort: true,
+        columns: [
+          {
+            name: "Filename",
+            formatter: (cell) => `${cell}`,
+          },
+          "Size",
+          {
+            name: "Screenshot",
+            formatter: (cell) => html(`<img src="${cell}" width=200>`),
+          },
+        ],
+        data: [...dataArray],
+      });
+      console.log(grid);
+
+      //   grid.updateConfig({ data: [...dataArray] });
+
+      grid.render(document.getElementById("sidebar") as Element);
+
+      files.length = 0;
 
       //
-
-      /*
-    fd.set('file',file);
-
-    promises.push( new Promise((resolve,reject)=>{
-      fetch( form.action, { method:'post', body:fd } )
-      .then( r=>r.json() )
-      .then( json=>resolve( json ) )
-      .catch( err=>reject( err ) )                    
-    }))
-    */
-
-      // process all files and display results
-      /*
-  Promise.all( promises )  
-  .then( results=>console.log(results) )
-  .catch( err=>alert(err) )
-  */
     });
   }
 }

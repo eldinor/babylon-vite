@@ -10,15 +10,25 @@
 </head>
 
 <body>
-    <script type="module" src="/src/app.ts"></script>
+  
     <!-- form action removed for testing only -->
-<form name='uploader' action='' method='post'><!-- upload.php -->
-    <h3>Upload File</h3>
-    <input type='file' name='myfile[]' multiple /> 
-    <button type='submit' name='save'>UPLOAD</button>
-  </form>
 
-  <div id="top"></div>
+
+  <nav id="topnavbar">
+    
+    <form id = "uploader" name="uploader" action='' method='post'>
+       
+        <input type='file' name='myfile[]' multiple /> 
+        <button type='submit' name='save'>UPLOAD</button>
+      </form>
+
+  </nav>
+
+  <div id="sidebar"></div>
+
+  <canvas id="renderCanvas" touch-action="none"></canvas>
+
+  <script type="module" src="/src/app.ts"></script>
 </body>
 
 </html>
