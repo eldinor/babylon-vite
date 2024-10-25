@@ -24,6 +24,7 @@
     "@babylonjs/loaders": "^6.29.1",
     "@babylonjs/materials": "^6.29.1",
     "@babylonjs/post-processes": "^6.29.1",
-    "earcut": "^2.2.4"
+    "earcut": "^2.2.4",
+    "simple-dropzone": "^0.8.3"
   }
 }
