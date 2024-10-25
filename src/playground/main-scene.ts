@@ -1,5 +1,6 @@
 import {
   ArcRotateCamera,
+  AutoReleaseWorkerPool,
   DefaultRenderingPipeline,
   Engine,
   HemisphericLight,
@@ -10,6 +11,7 @@ import {
 import "@babylonjs/loaders";
 
 import { Ground } from "./ground";
+import { makeWorker, processWorkers, workerFunction } from "./wFunc";
 
 export default class MainScene {
   private camera: ArcRotateCamera;
@@ -54,5 +56,102 @@ export default class MainScene {
   loadComponents(): void {
     // Load your files in order
     new Ground(this.scene);
+    const expressionURL =
+      "https://raw.githubusercontent.com/eldinor/RPM-Animations/main/expression/";
+
+    // Start WorkerPool after the scene is settled
+    this.scene.executeWhenReady(async () => {
+      const wPool = new AutoReleaseWorkerPool(8, makeWorker);
+
+      console.log(wPool);
+      const arr = [1, 2, 3, 4, 5, 6, 7, 8];
+
+      await processWorkers(expressionURL, expressionList, wPool);
+      console.log("FINISHED");
+    });
   }
 }
+
+export const expressionList = [
+  {
+    url: "M_Standing_Expressions_001.glb",
+  },
+  {
+    url: "M_Standing_Expressions_002.glb",
+  },
+  {
+    url: "M_Standing_Expressions_004.glb",
+  },
+  {
+    url: "M_Standing_Expressions_005.glb",
+  },
+  {
+    url: "M_Standing_Expressions_006.glb",
+  },
+  {
+    url: "M_Standing_Expressions_007.glb",
+  },
+  {
+    url: "M_Standing_Expressions_008.glb",
+  },
+  {
+    url: "M_Standing_Expressions_009.glb",
+  },
+  {
+    url: "M_Standing_Expressions_010.glb",
+  },
+  {
+    url: "M_Standing_Expressions_011.glb",
+  },
+  {
+    url: "M_Standing_Expressions_012.glb",
+  },
+  {
+    url: "M_Standing_Expressions_013.glb",
+  },
+  {
+    url: "M_Standing_Expressions_014.glb",
+  },
+  {
+    url: "M_Standing_Expressions_015.glb",
+  },
+  {
+    url: "M_Standing_Expressions_016.glb",
+  },
+  {
+    url: "M_Standing_Expressions_017.glb",
+  },
+  {
+    url: "M_Standing_Expressions_018.glb",
+  },
+  {
+    url: "M_Talking_Variations_001.glb",
+  },
+  {
+    url: "M_Talking_Variations_002.glb",
+  },
+  {
+    url: "M_Talking_Variations_003.glb",
+  },
+  {
+    url: "M_Talking_Variations_004.glb",
+  },
+  {
+    url: "M_Talking_Variations_005.glb",
+  },
+  {
+    url: "M_Talking_Variations_006.glb",
+  },
+  {
+    url: "M_Talking_Variations_007.glb",
+  },
+  {
+    url: "M_Talking_Variations_008.glb",
+  },
+  {
+    url: "M_Talking_Variations_009.glb",
+  },
+  {
+    url: "M_Talking_Variations_010.glb",
+  },
+];
