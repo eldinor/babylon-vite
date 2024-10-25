@@ -27,6 +27,7 @@ export default class MainScene {
   ) {
     this._setCamera(scene);
     this._setLight(scene);
+    this._setPipeLine();
     this.loadComponents();
   }
 
@@ -61,6 +62,8 @@ export default class MainScene {
       this.scene,
       [this.scene.activeCamera!]
     );
+    pipeline.samples = 4;
+    pipeline.fxaaEnabled = true;
   }
 
   loadComponents(): void {
@@ -76,7 +79,7 @@ export default class MainScene {
     let counter = 0;
 
     // keep track of selected files in this array
-    let files = [];
+    let files: Array<File> = [];
     let promises = [];
     let assetArrayBuffer: ArrayBuffer | undefined;
 
@@ -139,6 +142,8 @@ export default class MainScene {
           this.camera,
           {
             precision: 1.0,
+            width: 900,
+            height: 900,
           }
         );
         //   res.removeAllFromScene();
@@ -146,7 +151,9 @@ export default class MainScene {
         //  console.log(scr);
 
         //  dataLineArray.push(file.name, file.size, scr);
-        dataArray.push([file.name as string, file.size as string, scr]);
+
+        const sizeInMB = ((file as File).size / (1024 * 1024)).toFixed(2);
+        dataArray.push([(file as File).name, sizeInMB.toString(), scr]);
         res.dispose();
       }
       console.log(dataArray);
@@ -167,6 +174,17 @@ export default class MainScene {
           {
             name: "Screenshot",
             formatter: (cell) => html(`<img src="${cell}" width=300>`),
+            sort: {
+              compare: (a, b) => {
+                if (a > b) {
+                  return 1;
+                } else if (b > a) {
+                  return -1;
+                } else {
+                  return 0;
+                }
+              },
+            },
           },
         ],
         data: [...dataArray],
@@ -187,4 +205,17 @@ export default class MainScene {
       //
     });
   }
+}
+
+export function niceBytes(z: number) {
+  const units = ["bytes", "Kb", "Mb", "Gb", "Tb"];
+  let x = z.toString();
+  let l = 0,
+    n = parseInt(x, 10) || 0;
+
+  while (n >= 1024 && ++l) {
+    n = n / 1024;
+  }
+
+  return n.toFixed(2) + " " + units[l];
 }
