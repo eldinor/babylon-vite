@@ -9,7 +9,7 @@ import "@babylonjs/loaders";
 export class Ground {
   constructor(private scene: Scene) {
     this._createGround();
-    this._createSphere();
+    //  this._createSphere();
   }
 
   _createGround(): void {
@@ -20,7 +20,7 @@ export class Ground {
       { width: 10, height: 10 },
       scene
     );
-    new PhysicsAggregate(mesh, PhysicsShapeType.BOX, { mass: 0 }, scene);
+    //  new PhysicsAggregate(mesh, PhysicsShapeType.BOX, { mass: 0 }, scene);
   }
 
   _createSphere(): void {
