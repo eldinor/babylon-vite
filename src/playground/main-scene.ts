@@ -23,7 +23,8 @@ export default class MainScene {
   constructor(
     private scene: Scene,
     private canvas: HTMLCanvasElement,
-    private engine: Engine
+    private engine: Engine,
+    public files: Array<File>
   ) {
     this._setCamera(scene);
     this._setLight(scene);
@@ -92,7 +93,7 @@ export default class MainScene {
 
     const top = document.getElementById("top")!;
 
-    // event handler to add selcted files to array - one or more at a time
+    // event handler to add selected files to array - one or more at a time
     input!.addEventListener("change", function (e) {
       for (let i = 0; i < this.files.length; i++) files.push(this.files[i]);
     });
@@ -108,6 +109,9 @@ export default class MainScene {
 
       dataArray.length = 0; // if not the file will be added - TODO later, probably
 
+      let extRequired: Array<string | undefined> = [];
+      let assetInfo: string;
+
       for (const file of files) {
         console.info(
           "Promise to upload:%s",
@@ -115,6 +119,39 @@ export default class MainScene {
           (file as File).name
         );
         console.log(files);
+        SceneLoader.OnPluginActivatedObservable.addOnce((plugin) => {
+          console.log(plugin.name);
+          if (plugin.name === "gltf") {
+            const loader = plugin as GLTFFileLoader;
+            console.log(loader);
+
+            loader.onParsedObservable.addOnce((gltfBabylon) => {
+              console.log((gltfBabylon.json as any).asset);
+              if ((gltfBabylon.json as any).extensionsRequired) {
+                (gltfBabylon.json as any).extensionsRequired.forEach(
+                  (element: string) => {
+                    console.log(element);
+                    extRequired.push(element);
+                  }
+                );
+              }
+              if ((gltfBabylon.json as any).extensionsUsed) {
+                (gltfBabylon.json as any).extensionsUsed.forEach(
+                  (element: any) => {
+                    console.log("extensionsUsed", element);
+                  }
+                );
+              }
+              //
+              if ((gltfBabylon.json as any).asset.generator) {
+                assetInfo = (gltfBabylon.json as any).asset.generator;
+                console.log(assetInfo);
+              }
+              //
+              //
+            });
+          }
+        });
         //
         res = await SceneLoader.LoadAssetContainerAsync("", file);
 
@@ -135,7 +172,7 @@ export default class MainScene {
 
         this.camera.useFramingBehavior = true;
         this.camera.framingBehavior!.framingTime = 0;
-        this.camera.framingBehavior!.zoomOnMeshHierarchy(res.meshes[0], true);
+        this.camera.framingBehavior!.zoomOnMeshHierarchy(res.meshes[0], false);
 
         const scr = await Tools.CreateScreenshotUsingRenderTargetAsync(
           this.engine,
@@ -152,9 +189,20 @@ export default class MainScene {
 
         //  dataLineArray.push(file.name, file.size, scr);
 
-        const sizeInMB = ((file as File).size / (1024 * 1024)).toFixed(2);
-        dataArray.push([(file as File).name, sizeInMB.toString(), scr]);
+        const sizeInMB = parseFloat(
+          ((file as File).size / (1024 * 1024)).toFixed(2)
+        );
+        const fileSize = (file as File).size;
+        dataArray.push([
+          (file as File).name,
+          //  sizeInMB,
+          fileSize,
+          scr,
+          extRequired.join(", "),
+          assetInfo,
+        ]);
         res.dispose();
+        extRequired = [];
       }
       console.log(dataArray);
 
@@ -168,23 +216,19 @@ export default class MainScene {
         columns: [
           {
             name: "Filename",
-            formatter: (cell) => `${cell}`,
+            formatter: (cell) => html(`<b>${cell}</b>`),
           },
           "Size",
           {
             name: "Screenshot",
+            sort: false,
             formatter: (cell) => html(`<img src="${cell}" width=300>`),
-            sort: {
-              compare: (a, b) => {
-                if (a > b) {
-                  return 1;
-                } else if (b > a) {
-                  return -1;
-                } else {
-                  return 0;
-                }
-              },
-            },
+          },
+          {
+            name: "Required Extensions",
+          },
+          {
+            name: "Generator",
           },
         ],
         data: [...dataArray],
