@@ -46,7 +46,7 @@ form {padding: 15px;}
   margin-top: 60px;
   overflow: auto;
  width: 100%;
-
+z-index: 8000;
 
 
 }
@@ -57,7 +57,16 @@ footer{
   margin: 0;
   position: absolute;
  bottom: 0px;
+ color:thistle;
+
+ font-size: 1.1rem;
 }
+footer div{
+  position: absolute;
+  right: 40px;
+  bottom: 20px;
+}
+
 #progressBar {
   position: absolute;
   bottom:0px;
@@ -229,4 +238,19 @@ input::file-selector-button:hover{
   -webkit-transform: rotate(45deg);
   -ms-transform: rotate(45deg);
   transform: rotate(45deg);
+}
+
+#centerblock{
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  margin-right: -50%;
+  transform: translate(-50%, -50%);
+  z-index: 2;
+  display: none;
+}
+.insidebar{
+  padding: 10px 15px 10px 15px;
+  font-size: 1.3rem;
+  color: darkslategrey;
 }

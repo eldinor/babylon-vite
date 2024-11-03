@@ -19,7 +19,8 @@ class App {
   private canvas: HTMLCanvasElement | null;
 
   constructor() {
-    this.canvas = document.getElementById("renderCanvas") as HTMLCanvasElement; // Get the canvas element
+    //@ts-ignore
+    this.canvas = document.getElementById("renderCanvas")! as HTMLCanvasElement; // Get the canvas element
 
     this.init();
   }
@@ -37,7 +38,7 @@ class App {
     // Add physics. If not needed, you can annotate it to improve loading speed and environment performance.
     await this._setPhysics();
 
-    new MainScene(this.scene, this.canvas, this.engine);
+    new MainScene(this.scene, this.canvas as HTMLCanvasElement, this.engine);
 
     this._config();
     this._renderer();

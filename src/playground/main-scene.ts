@@ -24,7 +24,7 @@ export default class MainScene {
     private scene: Scene,
     private canvas: HTMLCanvasElement,
     private engine: Engine,
-    public files: Array<File>,
+    public files?: Array<File>,
     public screenShotOn: boolean = false
   ) {
     this._setCamera(scene);
@@ -100,7 +100,8 @@ export default class MainScene {
     const top = document.getElementById("top")!;
 
     // event handler to add selected files to array - one or more at a time
-    input!.addEventListener("change", function (e) {
+    input!.addEventListener("change", function (_e) {
+      //@ts-ignore
       for (let i = 0; i < this.files.length; i++) files.push(this.files[i]);
     });
 
@@ -207,7 +208,10 @@ export default class MainScene {
           const sizeInMB = parseFloat(
             ((file as File).size / (1024 * 1024)).toFixed(2)
           );
-          const fileSize = (file as File).size;
+          let fileSize = ((file as File).size / (1024 * 1024)).toFixed(
+            2
+          ) as any;
+          fileSize = parseFloat(fileSize) as number;
           const selectbox = true;
           dataArray.push([
             selectbox,
@@ -233,7 +237,7 @@ export default class MainScene {
       const showScreenshotsButton = document.getElementById(
         "showScreenshots"
       )! as HTMLInputElement;
-      showScreenshotsButton.addEventListener("change", function (e) {
+      showScreenshotsButton.addEventListener("change", function (_e) {
         console.log(showScreenshotsButton.checked);
         grid?.updateConfig({ columns: grid?.config.columns }).forceRender();
       });
@@ -241,7 +245,9 @@ export default class MainScene {
       grid = new Grid({
         resizable: true,
         sort: true,
-
+        // pagination: false,
+        //   fixedHeader: true,
+        //   height: "900px",
         columns: [
           {
             name: "Select",
@@ -278,7 +284,7 @@ export default class MainScene {
             name: "Filename",
             formatter: (cell) => html(`<b>${cell}</b>`),
           },
-          "Size",
+          "Size, Mb",
           {
             name: "Screenshot",
             sort: false,
