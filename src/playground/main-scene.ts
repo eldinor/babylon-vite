@@ -76,7 +76,9 @@ export default class MainScene {
 
     const screenshotArray: Array<string> = [];
 
-    const dataArray: Array<[string, string, string]> = [];
+    const dataArray: Array<
+      [boolean, string, number, string, string, string, ArrayBuffer]
+    > = [];
 
     let grid: Grid | undefined;
 
@@ -151,6 +153,14 @@ export default class MainScene {
                 if ((gltfBabylon.json as any).asset.generator) {
                   assetInfo = (gltfBabylon.json as any).asset.generator;
                 }
+
+                if ((gltfBabylon.json as any).asset.extras) {
+                  console.log(
+                    "EXTRAS",
+                    JSON.stringify((gltfBabylon.json as any).asset.extras)
+                  );
+                }
+
                 console.log("JSON", gltfBabylon.json);
                 //
               });
@@ -198,7 +208,9 @@ export default class MainScene {
             ((file as File).size / (1024 * 1024)).toFixed(2)
           );
           const fileSize = (file as File).size;
+          const selectbox = true;
           dataArray.push([
+            selectbox,
             (file as File).name,
             //  sizeInMB,
             fileSize,
@@ -231,6 +243,37 @@ export default class MainScene {
         sort: true,
 
         columns: [
+          {
+            name: "Select",
+            width: "6%",
+            sort: false,
+            //   formatter: (cell) => html(`<b>${cell}</b>`),
+
+            formatter: (cell, row) => {
+              return h(
+                "input",
+
+                {
+                  className: "testClass2",
+                  type: "checkbox",
+                  // src: cell as string,
+                  onClick: () => {
+                    console.log(row.cells);
+
+                    console.log(grid?.config.columns);
+
+                    //  grid!.config.columns[2]!.width = "20px";
+                    // console.log(grid?.config.columns[2]!.width);
+
+                    //   grid
+                    //   ?.updateConfig({ columns: grid?.config.columns })
+                    //   .forceRender();
+                  },
+                },
+                cell?.toString()
+              );
+            },
+          },
           {
             name: "Filename",
             formatter: (cell) => html(`<b>${cell}</b>`),
@@ -300,6 +343,9 @@ export default class MainScene {
         },
       });
       //  console.log(grid);
+      grid.on("rowClick", (...args) =>
+        console.log("row: " + JSON.stringify(args), args)
+      );
 
       //   grid.updateConfig({ data: [...dataArray] });
 
@@ -332,4 +378,8 @@ function isGLBAsset(name: string): boolean {
   }
 
   return name.endsWith(".glb");
+}
+
+export function parseBool(val: any) {
+  return val === true || val === "true";
 }
