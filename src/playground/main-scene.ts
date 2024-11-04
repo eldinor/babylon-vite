@@ -24,7 +24,7 @@ export default class MainScene {
     private scene: Scene,
     private canvas: HTMLCanvasElement,
     private engine: Engine,
-    public files?: Array<File>,
+    public fileToLoad?: Array<File>,
     public screenShotOn: boolean = false
   ) {
     this._setCamera(scene);
@@ -85,7 +85,7 @@ export default class MainScene {
     let counter = 0;
 
     // keep track of selected files in this array
-    let files: Array<File> = [];
+    let filesToLoad: Array<File> = [];
     let promises = [];
     let assetArrayBuffer: ArrayBuffer | undefined;
     let assetInfo: string;
@@ -101,8 +101,10 @@ export default class MainScene {
 
     // event handler to add selected files to array - one or more at a time
     input!.addEventListener("change", function (_e) {
-      //@ts-ignore
-      for (let i = 0; i < this.files.length; i++) files.push(this.files[i]);
+      console.log(_e);
+      console.log((_e.target as HTMLInputElement).files);
+      for (let i = 0; i < (_e.target as HTMLInputElement)!.files!.length; i++)
+        filesToLoad.push((_e.target as HTMLInputElement)!.files![i]);
     });
 
     bttn.addEventListener("click", async (e) => {
@@ -118,7 +120,7 @@ export default class MainScene {
 
       let extRequired: Array<string | undefined> = [];
 
-      for (const file of files) {
+      for (const file of filesToLoad) {
         console.log(isGLBAsset((file as File).name));
         if (isGLBAsset((file as File).name)) {
           console.info(
@@ -126,13 +128,21 @@ export default class MainScene {
             (file as File).size,
             (file as File).name
           );
-          console.log(files);
+          console.log(filesToLoad);
           SceneLoader.OnPluginActivatedObservable.addOnce((plugin) => {
             console.log(plugin.name);
             if (plugin.name === "gltf") {
               const loader = plugin as GLTFFileLoader;
+              loader.validate = true;
               console.log(loader);
-
+              //
+              loader.onValidatedObservable.add((results) => {
+                if (results.issues.numErrors > 0) {
+                  console.log("ERRORS: ", results.issues.numErrors);
+                  console.log("ERRORS: ", results.issues);
+                }
+              });
+              //
               loader.onParsedObservable.addOnce((gltfBabylon) => {
                 console.log((gltfBabylon.json as any).asset);
                 if ((gltfBabylon.json as any).extensionsRequired) {
@@ -175,7 +185,7 @@ export default class MainScene {
           assetArrayBuffer = await Tools.LoadFileAsync(objectURL, true);
           counter++;
 
-          let percent = (counter / files.length) * 100;
+          let percent = (counter / filesToLoad.length) * 100;
           (document.getElementById("progressBar") as any)!.value =
             Math.round(percent);
           setTimeout(() => {
@@ -357,7 +367,7 @@ export default class MainScene {
 
       grid.render(document.getElementById("sidebar") as Element);
 
-      files.length = 0;
+      filesToLoad.length = 0;
 
       //
     });
