@@ -1,14 +1,6 @@
 import "@babylonjs/core/Debug/debugLayer";
 import "@babylonjs/inspector";
-import {
-  Engine,
-  Scene,
-  AxesViewer,
-  Vector3,
-  ArcRotateCamera,
-  HavokPlugin,
-} from "@babylonjs/core";
-import HavokPhysics from "@babylonjs/havok";
+import { Engine, Scene, AxesViewer, Vector3, ArcRotateCamera, HavokPlugin } from "@babylonjs/core";
 
 import MainScene from "./playground/main-scene";
 
@@ -35,20 +27,10 @@ class App {
 
     this.scene = new Scene(this.engine);
 
-    // Add physics. If not needed, you can annotate it to improve loading speed and environment performance.
-    await this._setPhysics();
-
     new MainScene(this.scene, this.canvas as HTMLCanvasElement, this.engine);
 
     this._config();
     this._renderer();
-  }
-
-  async _setPhysics(): Promise<void> {
-    const gravity = new Vector3(0, -9.81, 0);
-    const hk = await HavokPhysics();
-    const plugin = new HavokPlugin(true, hk);
-    this.scene.enablePhysics(gravity, plugin);
   }
 
   _fps(): void {

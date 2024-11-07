@@ -24,7 +24,7 @@ export default class MainScene {
     private scene: Scene,
     private canvas: HTMLCanvasElement,
     private engine: Engine,
-    public fileToLoad?: Array<File>,
+    //  public fileToLoad?: Array<File>,
     public screenShotOn: boolean = false
   ) {
     this._setCamera(scene);
@@ -34,14 +34,7 @@ export default class MainScene {
   }
 
   _setCamera(scene: Scene): void {
-    this.camera = new ArcRotateCamera(
-      "camera",
-      Tools.ToRadians(90),
-      Tools.ToRadians(80),
-      15,
-      Vector3.Zero(),
-      scene
-    );
+    this.camera = new ArcRotateCamera("camera", Tools.ToRadians(90), Tools.ToRadians(80), 15, Vector3.Zero(), scene);
     this.camera.attachControl(this.canvas, true);
     // this.camera.setTarget(Vector3.Zero());
     this.camera.useFramingBehavior = true;
@@ -60,12 +53,7 @@ export default class MainScene {
   }
 
   _setPipeLine(): void {
-    const pipeline = new DefaultRenderingPipeline(
-      "default-pipeline",
-      false,
-      this.scene,
-      [this.scene.activeCamera!]
-    );
+    const pipeline = new DefaultRenderingPipeline("default-pipeline", false, this.scene, [this.scene.activeCamera!]);
     pipeline.samples = 4;
     pipeline.fxaaEnabled = true;
   }
@@ -76,9 +64,7 @@ export default class MainScene {
 
     const screenshotArray: Array<string> = [];
 
-    const dataArray: Array<
-      [boolean, string, number, string, string, string, ArrayBuffer]
-    > = [];
+    const dataArray: Array<[boolean, string, number, string, string, string, ArrayBuffer]> = [];
 
     let grid: Grid | undefined;
 
@@ -91,7 +77,6 @@ export default class MainScene {
     let assetInfo: string;
 
     // various form elements
-    console.log(document.forms);
     const form = document.forms.namedItem("uploader");
 
     const bttn = form!.save;
@@ -101,7 +86,6 @@ export default class MainScene {
 
     // event handler to add selected files to array - one or more at a time
     input!.addEventListener("change", function (_e) {
-      console.log(_e);
       console.log((_e.target as HTMLInputElement).files);
       for (let i = 0; i < (_e.target as HTMLInputElement)!.files!.length; i++)
         filesToLoad.push((_e.target as HTMLInputElement)!.files![i]);
@@ -113,28 +97,23 @@ export default class MainScene {
       let res: AssetContainer;
       (document.getElementById("progressBar") as any)!.value = 0;
       document.getElementById("sidebar")!.innerHTML = "";
-      (document.getElementById("progressBar") as any)!.style.display =
-        "inline-block";
+      (document.getElementById("progressBar") as any)!.style.display = "inline-block";
 
       dataArray.length = 0; // if not the file will be added - TODO later, probably
 
       let extRequired: Array<string | undefined> = [];
 
       for (const file of filesToLoad) {
-        console.log(isGLBAsset((file as File).name));
+        //  console.log(isGLBAsset((file as File).name));
         if (isGLBAsset((file as File).name)) {
-          console.info(
-            "Promise to upload:%s",
-            (file as File).size,
-            (file as File).name
-          );
-          console.log(filesToLoad);
+          console.info("Promise to upload:%s", (file as File).size, (file as File).name);
+          //   console.log(filesToLoad);
           SceneLoader.OnPluginActivatedObservable.addOnce((plugin) => {
             console.log(plugin.name);
             if (plugin.name === "gltf") {
               const loader = plugin as GLTFFileLoader;
               loader.validate = true;
-              console.log(loader);
+              //      console.log(loader);
               //
               loader.onValidatedObservable.add((results) => {
                 if (results.issues.numErrors > 0) {
@@ -146,19 +125,15 @@ export default class MainScene {
               loader.onParsedObservable.addOnce((gltfBabylon) => {
                 console.log((gltfBabylon.json as any).asset);
                 if ((gltfBabylon.json as any).extensionsRequired) {
-                  (gltfBabylon.json as any).extensionsRequired.forEach(
-                    (element: string) => {
-                      console.log(element);
-                      extRequired.push(element);
-                    }
-                  );
+                  (gltfBabylon.json as any).extensionsRequired.forEach((element: string) => {
+                    //         console.log(element);
+                    extRequired.push(element);
+                  });
                 }
                 if ((gltfBabylon.json as any).extensionsUsed) {
-                  (gltfBabylon.json as any).extensionsUsed.forEach(
-                    (element: any) => {
-                      console.log("extensionsUsed", element);
-                    }
-                  );
+                  (gltfBabylon.json as any).extensionsUsed.forEach((element: any) => {
+                    console.log("extensionsUsed", element);
+                  });
                 }
                 //
                 if ((gltfBabylon.json as any).asset.generator) {
@@ -166,13 +141,12 @@ export default class MainScene {
                 }
 
                 if ((gltfBabylon.json as any).asset.extras) {
-                  console.log(
-                    "EXTRAS",
-                    JSON.stringify((gltfBabylon.json as any).asset.extras)
-                  );
+                  //   console.log(
+                  //       "EXTRAS",
+                  //      JSON.stringify((gltfBabylon.json as any).asset.extras)
+                  //    );
                 }
-
-                console.log("JSON", gltfBabylon.json);
+                //    console.log("JSON", gltfBabylon.json);
                 //
               });
             }
@@ -186,41 +160,22 @@ export default class MainScene {
           counter++;
 
           let percent = (counter / filesToLoad.length) * 100;
-          (document.getElementById("progressBar") as any)!.value =
-            Math.round(percent);
+          (document.getElementById("progressBar") as any)!.value = Math.round(percent);
           setTimeout(() => {
-            (document.getElementById("progressBar") as any)!.style.display =
-              "none";
+            (document.getElementById("progressBar") as any)!.style.display = "none";
           }, 1000);
 
           res.addAllToScene();
 
-          this.camera.framingBehavior!.zoomOnMeshHierarchy(
-            res.meshes[0],
-            false
-          );
+          this.camera.framingBehavior!.zoomOnMeshHierarchy(res.meshes[0], false);
 
-          const scr = await Tools.CreateScreenshotUsingRenderTargetAsync(
-            this.engine,
-            this.camera,
-            {
-              precision: 1.0,
-              width: 900,
-              height: 900,
-            }
-          );
-          //   res.removeAllFromScene();
+          const scr = await Tools.CreateScreenshotUsingRenderTargetAsync(this.engine, this.camera, {
+            precision: 1.0,
+            width: 900,
+            height: 900,
+          });
           //
-          //  console.log(scr);
-
-          //  dataLineArray.push(file.name, file.size, scr);
-
-          const sizeInMB = parseFloat(
-            ((file as File).size / (1024 * 1024)).toFixed(2)
-          );
-          let fileSize = ((file as File).size / (1024 * 1024)).toFixed(
-            2
-          ) as any;
+          let fileSize = ((file as File).size / (1024 * 1024)).toFixed(2) as any;
           fileSize = parseFloat(fileSize) as number;
           const selectbox = true;
           dataArray.push([
@@ -238,18 +193,18 @@ export default class MainScene {
         } // end of
         //
       } //
-      console.log(dataArray);
+      //   console.log(dataArray);
       //
       if (grid) {
         grid.destroy();
       }
 
-      const showScreenshotsButton = document.getElementById(
-        "showScreenshots"
-      )! as HTMLInputElement;
+      const showScreenshotsButton = document.getElementById("showScreenshots")! as HTMLInputElement;
       showScreenshotsButton.addEventListener("change", function (_e) {
         console.log(showScreenshotsButton.checked);
-        grid?.updateConfig({ columns: grid?.config.columns }).forceRender();
+        if (grid !== undefined) {
+          grid.updateConfig({ columns: grid?.config.columns }).forceRender();
+        }
       });
 
       grid = new Grid({
@@ -321,15 +276,6 @@ export default class MainScene {
                   "div",
                   {
                     className: "testClass2",
-                    // src: cell as string,
-                    //   onClick: () => {
-                    //  grid!.config.columns[2]!.width = "20px";
-                    // console.log(grid?.config.columns[2]!.width);
-
-                    //   grid
-                    //   ?.updateConfig({ columns: grid?.config.columns })
-                    //   .forceRender();
-                    // },
                   },
                   ""
                 );
@@ -359,9 +305,7 @@ export default class MainScene {
         },
       });
       //  console.log(grid);
-      grid.on("rowClick", (...args) =>
-        console.log("row: " + JSON.stringify(args), args)
-      );
+      grid.on("rowClick", (...args) => console.log("row: " + JSON.stringify(args), args));
 
       //   grid.updateConfig({ data: [...dataArray] });
 
