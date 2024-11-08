@@ -19,6 +19,7 @@ import { Ground } from "./ground";
 
 export default class MainScene {
   private camera: ArcRotateCamera;
+  dataArray: Array<[boolean, string, number, string, string, string, string, ArrayBuffer]> = [];
 
   constructor(
     private scene: Scene,
@@ -64,8 +65,6 @@ export default class MainScene {
 
     const screenshotArray: Array<string> = [];
 
-    const dataArray: Array<[boolean, string, number, string, string, string, ArrayBuffer]> = [];
-
     let grid: Grid | undefined;
 
     let counter = 0;
@@ -99,7 +98,7 @@ export default class MainScene {
       document.getElementById("sidebar")!.innerHTML = "";
       (document.getElementById("progressBar") as any)!.style.display = "inline-block";
 
-      dataArray.length = 0; // if not the file will be added - TODO later, probably
+      this.dataArray.length = 0; // if not the file will be added - TODO later, probably
 
       let extRequired: Array<string | undefined> = [];
 
@@ -116,10 +115,10 @@ export default class MainScene {
               //      console.log(loader);
               //
               loader.onValidatedObservable.add((results) => {
-                if (results.issues.numErrors > 0) {
-                  console.log("ERRORS: ", results.issues.numErrors);
-                  console.log("ERRORS: ", results.issues);
-                }
+                // if (results.issues.numErrors > 0) {
+                console.log("ERRORS: ", results.issues.numErrors);
+                console.log("ERRORS: ", results.issues);
+                //  }
               });
               //
               loader.onParsedObservable.addOnce((gltfBabylon) => {
@@ -178,7 +177,7 @@ export default class MainScene {
           let fileSize = ((file as File).size / (1024 * 1024)).toFixed(2) as any;
           fileSize = parseFloat(fileSize) as number;
           const selectbox = true;
-          dataArray.push([
+          this.dataArray.push([
             selectbox,
             (file as File).name,
             //  sizeInMB,
@@ -186,6 +185,7 @@ export default class MainScene {
             scr,
             extRequired.join(", "),
             assetInfo,
+            "",
             assetArrayBuffer,
           ]);
           res.dispose();
@@ -290,8 +290,32 @@ export default class MainScene {
             name: "Generator",
             width: "15%",
           },
+          {
+            name: "3D",
+            width: "5%",
+            formatter: (cell, row, rowIndex) => {
+              return h(
+                "div",
+                {
+                  className: "testClass2",
+                  onClick: () => {
+                    //   console.log(grid?.config.columns[7]);
+                    console.log(row);
+                    console.log(row.cells[7].data);
+                    //  console.log(grid);
+                    //  console.log(this.dataArray);
+                  },
+                },
+                "werer"
+              );
+            },
+          },
+          {
+            name: "abuf",
+            hidden: true,
+          },
         ],
-        data: [...dataArray],
+        data: [...this.dataArray],
         //    search: true,
         style: {
           table: {
@@ -305,14 +329,14 @@ export default class MainScene {
         },
       });
       //  console.log(grid);
-      grid.on("rowClick", (...args) => console.log("row: " + JSON.stringify(args), args));
+      //   grid.on("rowClick", (...args) => console.log("row: " + JSON.stringify(args), args));
 
       //   grid.updateConfig({ data: [...dataArray] });
 
       grid.render(document.getElementById("sidebar") as Element);
 
       filesToLoad.length = 0;
-
+      //   this.dataArray.length = 0;
       //
     });
   }
