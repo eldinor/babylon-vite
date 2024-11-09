@@ -1,3 +1,24 @@
+import { Document, PropertyType, WebIO, Logger } from "../../node_modules/@gltf-transform/core";
+import { ALL_EXTENSIONS } from "@gltf-transform/extensions";
+import {
+  textureCompress,
+  dedup,
+  join,
+  weld,
+  prune,
+  resample,
+  instance,
+  quantize,
+  reorder,
+  simplify,
+  flatten,
+  meshopt,
+  listTextureSlots,
+  sparse,
+  TextureCompressOptions,
+} from "@gltf-transform/functions";
+
+import { MeshoptEncoder, MeshoptSimplifier, MeshoptDecoder } from "meshoptimizer";
 import {
   ArcRotateCamera,
   DefaultRenderingPipeline,
@@ -15,7 +36,9 @@ import { GLTFFileLoader } from "@babylonjs/loaders";
 import { Grid, h, html } from "gridjs";
 import "gridjs/dist/theme/mermaid.css";
 
-import { Ground } from "./ground";
+import { Viewer } from "@babylonjs/viewer";
+
+import MyWorker from "./worker?worker";
 
 export default class MainScene {
   private camera: ArcRotateCamera;
@@ -93,6 +116,8 @@ export default class MainScene {
     bttn.addEventListener("click", async (e) => {
       e.preventDefault();
 
+      document.getElementById("sidebar")!.style.display = "initial";
+
       let res: AssetContainer;
       (document.getElementById("progressBar") as any)!.value = 0;
       document.getElementById("sidebar")!.innerHTML = "";
@@ -151,11 +176,15 @@ export default class MainScene {
             }
           });
           //
-          res = await SceneLoader.LoadAssetContainerAsync("", file);
 
           let objectURL = URL.createObjectURL(file);
 
           assetArrayBuffer = await Tools.LoadFileAsync(objectURL, true);
+
+          const arr = new Uint8Array(assetArrayBuffer);
+
+          res = await SceneLoader.LoadAssetContainerAsync("", arr, this.scene, undefined, ".glb");
+
           counter++;
 
           let percent = (counter / filesToLoad.length) * 100;
@@ -165,6 +194,57 @@ export default class MainScene {
           }, 1000);
 
           res.addAllToScene();
+
+          //
+          const io = new WebIO().registerExtensions(ALL_EXTENSIONS).registerDependencies({
+            "meshopt.decoder": MeshoptDecoder,
+            "meshopt.encoder": MeshoptEncoder,
+          });
+
+          const doc = await io.readBinary(arr);
+          doc.setLogger(new Logger(Logger.Verbosity.DEBUG));
+          console.log(doc.getRoot().getAsset().generator);
+
+          await MeshoptEncoder.ready;
+          await doc.transform(
+            dedup(),
+            flatten(),
+            join(),
+            prune(),
+            resample(),
+            weld(),
+            simplify({
+              simplifier: MeshoptSimplifier,
+              //   ratio:
+              //  error:
+              lockBorder: false,
+            }),
+            //  quantize()
+            textureCompress({
+              //  targetFormat: "webp",
+              resize: [1024, 1024],
+            }),
+            // reorder({ encoder: MeshoptEncoder })
+            meshopt({ encoder: MeshoptEncoder, level: "high" })
+          );
+
+          /*
+                      textureCompress({
+              //  targetFormat: "webp",
+              resize: [1024, 1024],
+            })
+          //
+            textureCompress({
+              targetFormat: "webp",
+              encoder: undefined,
+            })
+            */
+
+          const glb = await io.writeBinary(doc);
+          const assetBlob = new Blob([glb]);
+
+          console.log("Original", arr.length);
+          console.log(assetBlob.size);
 
           this.camera.framingBehavior!.zoomOnMeshHierarchy(res.meshes[0], false);
 
@@ -206,6 +286,9 @@ export default class MainScene {
           grid.updateConfig({ columns: grid?.config.columns }).forceRender();
         }
       });
+
+      //  let viewer = new Viewer(this.engine);
+      //    viewer.loadModel("https://playground.babylonjs.com/scenes/BoomBox.glb");
 
       grid = new Grid({
         resizable: true,
@@ -293,7 +376,7 @@ export default class MainScene {
           {
             name: "3D",
             width: "5%",
-            formatter: (cell, row, rowIndex) => {
+            formatter: (cell, row) => {
               return h(
                 "div",
                 {
@@ -302,6 +385,7 @@ export default class MainScene {
                     //   console.log(grid?.config.columns[7]);
                     console.log(row);
                     console.log(row.cells[7].data);
+                    document.getElementById("sidebar")!.style.display = "none";
                     //  console.log(grid);
                     //  console.log(this.dataArray);
                   },
@@ -337,6 +421,18 @@ export default class MainScene {
 
       filesToLoad.length = 0;
       //   this.dataArray.length = 0;
+      /*
+      const newWorker = new MyWorker();
+
+      console.log(newWorker);
+      console.log(this.dataArray[0][7]);
+
+      newWorker.postMessage(this.dataArray[0][7]);
+
+      newWorker.onmessage = (evt) => {
+        console.log(evt);
+      };
+      */
       //
     });
   }

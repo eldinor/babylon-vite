@@ -13,7 +13,7 @@ class App {
   constructor() {
     //@ts-ignore
     this.canvas = document.getElementById("renderCanvas")! as HTMLCanvasElement; // Get the canvas element
-
+    //   document.body.append(this.canvas);
     this.init();
   }
 
