@@ -10,29 +10,19 @@ import {
 import "@babylonjs/loaders";
 
 import { Ground } from "./ground";
+import { GameEntity } from "./baseEntity";
 
 export default class MainScene {
   private camera: ArcRotateCamera;
 
-  constructor(
-    private scene: Scene,
-    private canvas: HTMLCanvasElement,
-    private engine: Engine
-  ) {
+  constructor(private scene: Scene, private canvas: HTMLCanvasElement, private engine: Engine) {
     this._setCamera(scene);
     this._setLight(scene);
     this.loadComponents();
   }
 
   _setCamera(scene: Scene): void {
-    this.camera = new ArcRotateCamera(
-      "camera",
-      Tools.ToRadians(90),
-      Tools.ToRadians(80),
-      20,
-      Vector3.Zero(),
-      scene
-    );
+    this.camera = new ArcRotateCamera("camera", Tools.ToRadians(90), Tools.ToRadians(80), 20, Vector3.Zero(), scene);
     this.camera.attachControl(this.canvas, true);
     this.camera.setTarget(Vector3.Zero());
   }
@@ -43,16 +33,27 @@ export default class MainScene {
   }
 
   _setPipeLine(): void {
-    const pipeline = new DefaultRenderingPipeline(
-      "default-pipeline",
-      false,
-      this.scene,
-      [this.scene.activeCamera!]
-    );
+    const pipeline = new DefaultRenderingPipeline("default-pipeline", false, this.scene, [this.scene.activeCamera!]);
   }
 
   loadComponents(): void {
     // Load your files in order
     new Ground(this.scene);
+    console.log(Vector3.Forward());
+
+    const bEnt = new GameEntity();
+
+    console.log(bEnt.uuid);
+
+    const ent2 = new GameEntity();
+
+    bEnt.add(ent2);
+    console.log(bEnt);
+    console.log(bEnt.rotation);
+    console.log(bEnt.getDirection(new Vector3(2, 3, 4)));
+
+    console.log(bEnt.getWorldPosition(new Vector3(2, 3, 4)));
+
+    ///
   }
 }
