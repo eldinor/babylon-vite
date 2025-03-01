@@ -110,14 +110,23 @@ export default class MainScene {
     wall006_1.position.y = 1.65;
     wall006_1.position.z = 0.7;
 
-    //
+    /*
+    const ceil2 = await SceneLoader.ImportMeshAsync("", "panel/floor059-opt.glb");
+    const c2 = ceil2.meshes[0];
 
+    c2.rotationQuaternion = null;
+    c2.position = new Vector3(3, 3, 0);
+    c2.rotation.y = Math.PI / 2;
+    c2.rotation.z = Math.PI;
+*/
+    //
+    /*
     const wall02 = await SceneLoader.ImportMeshAsync("", "panel/wall02-opt.glb");
     wall02.meshes[0].rotationQuaternion = null;
     wall02.meshes[0].position.x = -1.7;
     // wall02.meshes[0].position.y = 1.65;
     wall02.meshes[0].position.z = 1.7;
-    /*
+  
     //res013.meshes[1].setEnabled(false);
    
     //  res013.meshes[0].scaling.scaleInPlace(2)
@@ -204,11 +213,18 @@ export default class MainScene {
     const ceiling = f047.meshes[0];
     //  ceiling.setEnabled(true);
     console.log(ceiling.rotationQuaternion);
-    ceiling.rotationQuaternion = Quaternion.RotationAxis(new Vector3(0, 0, 1), Math.PI);
+
+    ceiling.rotationQuaternion = null;
+    ceiling.rotation.y = Math.PI / 2;
+    // ceiling.rotationQuaternion = Quaternion.RotationAxis(new Vector3(0, 0, 1), Math.PI);
     //  ceiling.rotationQuaternion = Quaternion.RotationAxis(new Vector3(0, 0, 1), Math.PI);
     // ceiling.rotation.y = Tools.ToRadians(90);
     //  ceiling.rotation.y = Math.PI / 2;
-    ceiling.position.y = 3;
+    ceiling.position.x = -0.15;
+    ceiling.position.y = 2.95;
+
+    const ceil2 = (ceiling as Mesh).instantiateHierarchy();
+    ceiling.position.x = 3;
 
     /*
       let inst180 = this.makeFloorInstances(fl as Mesh);
